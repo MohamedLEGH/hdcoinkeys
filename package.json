@@ -1,0 +1,11 @@
+{
+  "name": "hdcoinkeys",
+  "version": "1.0.0",
+  "description": "an hd wallet generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mohamed Amine LEGHERABA",
+  "license": "ISC"
+}
