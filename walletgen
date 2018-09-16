@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 'use strict';
 
-var ArgumentParser = require('argparse').ArgumentParser;
-
-var library = require('./library')
+const ArgumentParser = require('argparse').ArgumentParser;
+const readline = require('readline');
+const library = require('./library')
 
 var coins = ['bitcoin','bitcoin-testnet','ethereum']
 
@@ -45,6 +45,23 @@ parser.addArgument(
   }
 );
 
+parser.addArgument(
+  [ '-d', '--data' ],
+  {
+    help: 'give data from 24 mnemonic words, an account number and a network',
+    action: 'storeTrue'
+  }
+);
+
+parser.addArgument(
+  [ '-e', '--datafromseed' ],
+  {
+    help: 'give data from seed, an account number and a network',
+    action: 'storeTrue'
+  }
+);
+
+
 function print_words(){
     const mnemo = library.create_mnemonic()
     console.log(mnemo[0])
@@ -70,33 +87,34 @@ function get_address(data){
 
 }
 
-function print_accountfromseed(words,network,account_number){
+function print_accountfromseed(seed,network,account_number){
 
     if(!coins.includes(network)){
         throw "Wrong Network : should be ethereum or bitcoin or bitcoin-testnet!"
     }
-    data = library.account_from_seed(seed,accoun_number,network)
+    const data = library.account_from_seed(seed,account_number,network)
     if(network === "bitcoin"){
-        console.log("private key : " + data[0].hex() + "\n")
+        console.log("private key : " + data[0].toString('hex') + "\n")
         console.log("WIF : " + data[2] + "\n")
-        console.log("public key : " + data[3].hex() + "\n")
+        console.log("public key : " + data[3].toString('hex') + "\n")
         console.log("address : " + data[1] + "\n")
     }
     else if(network === "bitcoin-testnet"){
-        console.log("private key : " + data[0].hex() + "\n")
+        console.log("private key : " + data[0].toString('hex') + "\n")
         console.log("WIF : " + data[2] + "\n")
-        console.log("public key : " + data[3].hex() + "\n")
+        console.log("public key : " + data[3].toString('hex') + "\n")
         console.log("address : " + data[1] + "\n")
     }
     else if(network === "ethereum"){
-        console.log("private key : " + data[0].hex() + "\n")
+        console.log("private key : " + data[0].toString('hex') + "\n")
         console.log("address : " + data[1] + "\n")                        
     }
 }
 
-function print_accountfromseed(words,network,account_number){
+function print_account(words,network,account_number){
     const seed = library.create_seed(words)
-    print_accountfromseed(words,network,account_number)
+    console.log("seed:" + seed.toString('hex')) 
+    print_accountfromseed(seed,network,account_number)
 }
 
 function print_privatekey(seed,network,account_number){
@@ -119,7 +137,7 @@ function print_address(seed,network,account_number){
 
 
 var args = parser.parseArgs();
-console.dir(args);
+//console.dir(args);
 
 const vals = Object.values(args)
 const nb = vals.filter(Boolean).length
@@ -145,4 +163,52 @@ if(args['seedfromwords']){
     const words = args['seedfromwords']
     const seed = library.create_seed(words)
     console.log(seed.toString('hex'))
+}
+
+if(args['data']){
+
+    var rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    rl.question("Please input 24 mnemonic words :\n", function(words) {
+    rl.question("Please enter network (bitcoin, bitcoin-testnet or ethereum) :", function(network) {
+    if(!coins.includes(network)){
+        throw "Wrong Network : should be ethereum or bitcoin or bitcoin-testnet!"
+    }
+    rl.question("Please enter account number :", function(nb) {
+        
+        const account = parseInt(nb)
+        console.log("words:" + words)
+        console.log("type:" + typeof(words))
+        console.log("\n ********** Account Data ********** \n")
+        print_account(words,network,account)
+        rl.close();
+    })
+})
+});
+}
+
+if(args['datafromseed']){
+
+    var rl = readline.createInterface({
+        input: process.stdin,
+       output: process.stdout
+    });
+
+    rl.question("Please input seed :\n", function(s) {
+    rl.question("Please enter network (bitcoin, bitcoin-testnet or ethereum) :", function(network) {
+    if(!coins.includes(network)){
+        throw "Wrong Network : should be ethereum or bitcoin or bitcoin-testnet!"
+    }
+    rl.question("Please enter account number :", function(nb) {
+        const seed = new Buffer.from(s, 'hex')
+        const account = parseInt(nb)
+        console.log("\n ********** Account Data ********** \n")
+        print_accountfromseed(seed,network,account)
+        rl.close();
+    })
+})
+});
 }
