@@ -1,3 +1,5 @@
+'use strict';
+
 var bip39 = require('bip39')
 var HDKey = require('hdkey')
 
@@ -10,7 +12,7 @@ var ethUtil = require('ethereumjs-util')
 // Following https://iancoleman.io/bip39/
 
 function create_words(){
-    return bip39.generateMnemonic(strength=256);
+    return bip39.generateMnemonic(256);
 }
 
 function create_seed(words){
@@ -18,8 +20,8 @@ function create_seed(words){
 }
 
 function create_mnemonic(){
-    words = create_words();
-    seed = create_seed(words);
+    const words = create_words();
+    const seed = create_seed(words);
     return [words,seed]
 }
 
@@ -45,12 +47,12 @@ function coin_data(C){
 }
 
 function bitcoin_data(key){
-    C = CoinKey(key)
+    const C = CoinKey(key)
     return coin_data(C)
 }
 
 function bitcointestnet_data(key){
-    C = CoinKey(key,coininfo('BTC-TEST'))
+    const C = CoinKey(key,coininfo('BTC-TEST'))
     return coin_data(C)
 }
 
@@ -93,16 +95,16 @@ function account_from_rootkey(key,account_number,network){
         console.log("error : wrong network" + network);
         throw "Wrong Network : should be ethereum or bitcoin or bitcoin-testnet!";
     }
-    var net = network_number.toString()
-    var index = account_number.toString()
+    const net = network_number.toString()
+    const index = account_number.toString()
     
-    path = `m/44'/${net}'/0'/0/${index}`
-    account = key.derive(path)
+    const path = `m/44'/${net}'/0'/0/${index}`
+    const account = key.derive(path)
     return account_from_privatekey(account.privateKey,network)
 }
 
 function account_from_seed(seed,nb,network){
-    rootK = rootkey_from_seed(seed,network)
+    const rootK = rootkey_from_seed(seed,network)
     return account_from_rootkey(rootK,nb,network)
 }
 
