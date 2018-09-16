@@ -40,6 +40,20 @@ function rootkey_from_seed(seed,network){
     return hdkey
 }
 
+function coin_data(C){
+    return [C.privateKey,C.publicAddress,C.privateWif,C.publicKey]
+}
+
+function bitcoin_data(key){
+    C = CoinKey(key)
+    return coin_data(C)
+}
+
+function bitcointestnet_data(key){
+    C = CoinKey(key,coininfo('BTC-TEST'))
+    return coin_data(C)
+}
+
 function ethereum_account_to_addr(p){
     const pubKey = ethUtil.privateToPublic(p);
     const addr = ethUtil.publicToAddress(pubKey).toString('hex');
@@ -47,15 +61,20 @@ function ethereum_account_to_addr(p){
     return address
 }
 
+function ethereum_data(key){
+    return [key,ethereum_account_to_addr(key)]
+}
+
+
 function account_from_privatekey(key,network){
     if(network === 'bitcoin'){
-        return CoinKey(key)
+        return bitcoin_data(key)
     }
     else if(network === 'bitcoin-testnet'){
-        return new CoinKey(key,coininfo('BTC-TEST'))
+        return bitcointestnet_data(key)
     }
     else if(network === 'ethereum'){
-        return [key,ethereum_account_to_addr(key)]
+        return ethereum_data(key)
     }
 
 }
@@ -80,6 +99,11 @@ function account_from_rootkey(key,account_number,network){
     path = `m/44'/${net}'/0'/0/${index}`
     account = key.derive(path)
     return account_from_privatekey(account.privateKey,network)
+}
+
+function account_from_seed(seed,nb,network){
+    rootK = rootkey_from_seed(seed,network)
+    return account_from_rootkey(rootK,nb,network)
 }
 
 /*
@@ -120,27 +144,28 @@ console.log(hdkey.publicExtendedKey)
 
 
 */
-var t = rootkey_from_seed(testS,network='bitcoin')
-var bitcoin = account_from_rootkey(t,account_number=0,network='bitcoin')
-var bitcointest = account_from_rootkey(t,account_number=0,network='bitcoin-testnet')
-var ethereum = account_from_rootkey(t,account_number=0,network='ethereum')
+//var t = rootkey_from_seed(testS,network='bitcoin')
+//var tp = rootkey_from_seed(testS,network='bitcoin-testnet')
+var bitcoin = account_from_seed(testS,0,'bitcoin')
+var bitcointest = account_from_seed(testS,0,'bitcoin-testnet')
+var ethereum = account_from_seed(testS,0,'ethereum')
 
 //var addr = ethereum_priv_to_addr(pr)
 //var bitcoin = bitcoin_fromkey(pr)
 //var bitcointest = bitcointestnet_fromkey(prt)
-console.log("*********Zero*********")
+console.log("*********Zero Bitcoin WIF*********")
 
-console.log(bitcoin.privateWif)
-console.log("*********Zero Address*********")
-console.log(bitcoin.publicAddress)
+console.log(bitcoin[2])
+console.log("*********Zero Bitcoin Address*********")
+console.log(bitcoin[1])
 
-console.log("*********Zero Testnet*********")
-console.log(bitcointest.privateWif)
-console.log("*********Zero Address*********")
-console.log(bitcointest.publicAddress)
+console.log("*********Zero BitcoinTestnet WIF*********")
+console.log(bitcointest[2])
+console.log("*********Zero BitcoinTestnet Address*********")
+console.log(bitcointest[1])
 
-console.log("*********Zero Ethereum*********")
+console.log("*********Zero Ethereum PrivateKey*********")
 console.log(ethereum[0].toString('hex'))
-console.log("*********Zero Address*********")
+console.log("*********Zero Ethereum Address*********")
 console.log(ethereum[1])
 
