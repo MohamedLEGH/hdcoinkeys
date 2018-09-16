@@ -9,7 +9,9 @@ Follow same pattern as this website : https://iancoleman.io/bip39/
 # install
 
 git clone https://github.com/MohamedLEGH/hdcoinkeys
+
 cd hdcoinkeys
+
 npm install
 
 chmod u+x walletgen
