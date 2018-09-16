@@ -1,13 +1,49 @@
 #!/usr/bin/env node
 'use strict';
 
+var ArgumentParser = require('argparse').ArgumentParser;
+
 var library = require('./library')
 
 var coins = ['bitcoin','bitcoin-testnet','ethereum']
 
-const [,, ... args] = process.argv
-console.log("Hello World " + args);
+var parser = new ArgumentParser({
+  version: '0.0.1',
+  addHelp:true,
+  description: 'HD Wallet generator',
+});
 
+parser.addArgument(
+  [ '-m', '--mnemonic' ],
+  {
+    help: 'generate 24 mnemonic words and the equivalent seed and output them in the commandline',
+    action: 'storeTrue'
+  }
+);
+
+parser.addArgument(
+  [ '-w', '--words' ],
+  {
+    help: 'generate 24 mnemonic words and output it in the commandline',
+    action: 'storeTrue'
+  }
+);
+
+parser.addArgument(
+  [ '-s', '--seed' ],
+  {
+    help: 'generate a seed and output it in the commandline',
+    action: 'storeTrue'
+  }
+);
+
+parser.addArgument(
+  ['--seedfromwords' ],
+  {
+    help: 'get seed from 24 words (input a string)',
+    action: 'store'
+  }
+);
 
 function print_words(){
     const mnemo = library.create_mnemonic()
@@ -81,4 +117,32 @@ function print_address(seed,network,account_number){
     console.log(get_address(data).toString('hex'))
 }
 
-print_words()
+
+var args = parser.parseArgs();
+console.dir(args);
+
+const vals = Object.values(args)
+const nb = vals.filter(Boolean).length
+
+if(nb>1){
+    throw "Error : too many arguments"
+}
+
+if(args['mnemonic']){
+    print_mnemonic()
+
+}
+
+else if(args['words']){
+    print_words()
+}
+
+else if(args['seed']){
+    print_seed()
+}
+
+if(args['seedfromwords']){
+    const words = args['seedfromwords']
+    const seed = library.create_seed(words)
+    console.log(seed.toString('hex'))
+}

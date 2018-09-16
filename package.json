@@ -9,6 +9,7 @@
   "author": "Mohamed Amine LEGHERABA",
   "license": "ISC",
   "dependencies": {
+    "argparse": "^1.0.10",
     "bip39": "^2.5.0",
     "coininfo": "^4.3.0",
     "coinkey": "^3.0.0",
