@@ -114,8 +114,16 @@ function bitcointestnet_fromkey(p){
     return new CoinKey(pr,coininfo('BTC-TEST'))
 }
 */
-/////////////// Test ////////////////
 
+module.exports = {
+  create_mnemonic: create_mnemonic,
+  create_seed: create_seed,
+  account_from_seed: account_from_seed
+}
+
+
+/////////////// Test ////////////////
+if (typeof module != 'undefined' && !module.parent) {
 var test = create_words();
 
 console.log(test)
@@ -168,4 +176,4 @@ console.log("*********Zero Ethereum PrivateKey*********")
 console.log(ethereum[0].toString('hex'))
 console.log("*********Zero Ethereum Address*********")
 console.log(ethereum[1])
-
+}
